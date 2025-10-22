@@ -15,13 +15,18 @@ pipeline {
         stage('Snyk Test') {
             steps {
                 script {
-                    // Run Snyk test with credentials
+                    // Install Snyk CLI
+                    sh 'npm install -g snyk'
+
+                    // Authenticate and test
                     withCredentials([string(credentialsId: 'snyk', variable: 'SNYK_TOKEN')]) {
-                        sh 'snyk test --token=$SNYK_TOKEN'
+                        sh 'snyk auth $SNYK_TOKEN'
+                        sh 'snyk test'
                     }
                 }
             }
         }
+
 
         stage('Upload to AWS') {
             steps {
