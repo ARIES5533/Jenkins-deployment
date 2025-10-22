@@ -15,11 +15,18 @@ pipeline {
         stage('Snyk Test') {
             steps {
                 script {
-                    // Install Snyk CLI
+                    // Install Node.js and npm
+                    sh '''
+                        apt-get update -y
+                        apt-get install -y nodejs npm
+                    '''
+
+                    // Install Snyk
                     sh 'npm install -g snyk'
+                    sh 'snyk --version'
 
                     // Authenticate and test
-                    withCredentials([string(credentialsId: 'snyk', variable: 'SNYK_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'your-snyk-api-token', variable: 'SNYK_TOKEN')]) {
                         sh 'snyk auth $SNYK_TOKEN'
                         sh 'snyk test'
                     }
