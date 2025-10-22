@@ -1,16 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'        // Node.js + npm preinstalled
-            args '-u root'         // Optional, gives full permissions inside container
-        }
-    }
+    agent any
 
     stages {
         stage('Build') {
             steps {
+                sh 'echo "Hello World"'
                 sh '''
-                    echo "Hello World"
                     echo "Multiline shell steps work too"
                     ls -lah
                 '''
@@ -20,13 +15,9 @@ pipeline {
         stage('Snyk Test') {
             steps {
                 script {
-                    // Install Snyk CLI
-                    sh 'npm install -g snyk'
-
-                    // Authenticate and run Snyk test
+                    // Run Snyk test with credentials
                     withCredentials([string(credentialsId: 'snyk', variable: 'SNYK_TOKEN')]) {
-                        sh 'snyk auth $SNYK_TOKEN'
-                        sh 'snyk test'
+                        sh 'snyk test --token=$SNYK_TOKEN'
                     }
                 }
             }
